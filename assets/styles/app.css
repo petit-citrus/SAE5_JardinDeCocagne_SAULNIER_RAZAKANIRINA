@@ -1,3 +1,108 @@
+
+:root {
+    --vert-fonce: #244b37;
+    --vert: #4e805c;
+    --creme: #f7f8f2;
+    --texte: #26352c;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background-color: skyblue;
+    margin: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    background: var(--creme);
+    color: var(--texte);
+    -webkit-font-smoothing: antialiased;
+}
+.accueil {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.entete {
+    background: var(--vert-fonce);
+    color: white;
+    padding: 24px 8%;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.contenu {
+    width: min(900px, 90%);
+    margin: 70px auto;
+    flex: 1;
+}
+
+.sous-titre {
+    color: var(--vert);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+h1 {
+    font-size: clamp(38px, 5vw, 58px);
+    font-weight: 500;
+    letter-spacing: -2.2px;
+    line-height: 1.12;
+    color: var(--vert-fonce);
+    margin-bottom: 24px;
+}
+
+h2 {
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.8px;
+}
+
+.sous-titre {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--vert);
+}
+
+.description {
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.8;
+    max-width: 680px;
+}
+
+.carte {
+    background: white;
+    border: 1px solid #e3e8df;
+    border-radius: 8px;
+    padding: 36px;
+    margin-top: 48px;
+    box-shadow: none;
+}
+
+.carte h2 {
+    color: var(--vert-fonce);
+}
+
+.equipe {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.membre {
+    background: #f3f5ef;
+    padding: 22px;
+    border-radius: 6px;
+}
+
+.pied-page {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.1px;
 }
