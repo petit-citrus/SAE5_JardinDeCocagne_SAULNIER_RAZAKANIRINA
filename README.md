@@ -1,4 +1,4 @@
-# SAÉ 5 — Jardins de Cocagne
+# SAÉ 5 —à Jardins de Cocagne
 
 Projet réalisé dans le cadre de la SAÉ 5 (BUT 3 Informatique, IUT de Saint-Dié-des-Vosges).
 
