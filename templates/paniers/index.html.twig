@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Composition des paniers{% endblock %}
+
+{% block body %}
+<main class="page-paniers">
+
+    <header class="paniers-entete">
+        <h1>Composition des paniers</h1>
+        <p>
+            Proposition automatique de répartition
+            des légumes selon les stocks disponibles.
+        </p>
+    </header>
+
+    <section class="paniers-section">
+        <h2>Stocks disponibles</h2>
+
+        <table class="paniers-table">
+            <thead>
+                <tr>
+                    <th>Légume</th>
+                    <th>Quantité</th>
+                    <th>Prix unitaire</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nom, stock in stocks %}
+                    <tr>
+                        <td>{{ nom|replace({'_': ' '})|capitalize }}</td>
+                        <td>{{ stock.quantite|number_format(2, ',', ' ') }} kg</td>
+                        <td>{{ stock.prix|number_format(2, ',', ' ') }} €/kg</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="paniers-section">
+        <h2>Compositions proposées</h2>
+
+        <p>
+            Coefficient de répartition :
+            <strong>
+                {{ (resultat.coefficientRepartition * 100)|number_format(1, ',', ' ') }} %
+            </strong>
+        </p>
+
+        {% for nom, panier in resultat.paniers %}
+            <article class="paniers-composition">
+                <h3>Panier {{ nom }}</h3>
+
+                <p>Nombre à préparer : {{ panier.nombre }}</p>
+
+                <ul>
+                    {% for legume, quantite in panier.composition %}
+                        <li>
+                            {{ legume|replace({'_': ' '})|capitalize }} :
+                            {{ quantite|number_format(3, ',', ' ') }} kg
+                            par panier
+                        </li>
+                    {% else %}
+                        <li>Aucun légume disponible.</li>
+                    {% endfor %}
+                </ul>
+
+                <p>
+                    Valeur obtenue :
+                    <strong>
+                        {{ panier.valeur|number_format(2, ',', ' ') }} €
+                    </strong>
+                    /
+                    {{ panier.valeurCible|number_format(2, ',', ' ') }} €
+                </p>
+            </article>
+        {% endfor %}
+    </section>
+
+    <section class="paniers-section">
+        <h2>Stocks restants</h2>
+
+        <table class="paniers-table">
+            <thead>
+                <tr>
+                    <th>Légume</th>
+                    <th>Quantité restante</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nom, stock in resultat.stocksRestants %}
+                    <tr>
+                        <td>{{ nom|replace({'_': ' '})|capitalize }}</td>
+                        <td>
+                            {{ stock.quantite|number_format(3, ',', ' ') }} kg
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <footer class="paniers-retour">
+        <a href="{{ path('app_home') }}">Retour à l'accueil</a>
+    </footer>
+
+</main>
+{% endblock %}
