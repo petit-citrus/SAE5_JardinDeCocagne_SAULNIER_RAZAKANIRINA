@@ -93,6 +93,174 @@ public function testVerifierStocks(): void
 }
 
 
+    public function testGenererComposition(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [
+            'carottes' => [
+                'quantite' => 10.0,
+                'prix' => 2.0,
+            ],
+            'pommes_de_terre' => [
+                'quantite' => 15.0,
+                'prix' => 1.5,
+            ],
+            'poireaux' => [
+                'quantite' => 8.0,
+                'prix' => 3.0,
+            ],
+        ];
+
+        $typesPaniers = [
+            [
+                'nom' => 'Simple',
+                'nombre' => 10,
+                'valeurCible' => 5.0,
+            ],
+            [
+                'nom' => 'Familial',
+                'nombre' => 5,
+                'valeurCible' => 10.0,
+            ],
+        ];
+
+        $resultat = $service->genererComposition(
+            $stocks,
+            $typesPaniers
+        );
+       
+
+        // Vérifier que les deux types ont été générés.
+        $this->assertArrayHasKey(
+            'Simple',
+            $resultat['paniers']
+        );
+
+        $this->assertArrayHasKey(
+            'Familial',
+            $resultat['paniers']
+        );
+
+        // Vérifier qu'aucun stock n'est devenu négatif.
+        foreach ($resultat['stocksRestants'] as $stock) {
+            $this->assertGreaterThanOrEqual(
+                -0.000001,
+                $stock['quantite']
+            );
+        }
+
+        // Vérifier que les paniers ne dépassent pas
+        // leur valeur cible.
+        foreach ($resultat['paniers'] as $panier) {
+            $this->assertLessThanOrEqual(
+                $panier['valeurCible'] + 0.000001,
+                $panier['valeur']
+            );
+        }
+    }
+
+    public function testCalculerValeurStock(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [
+            'carottes' => [
+                'quantite' => 10.0,
+                'prix' => 2.0,
+            ],
+            'pommes_de_terre' => [
+                'quantite' => 15.0,
+                'prix' => 1.5,
+            ],
+            'poireaux' => [
+                'quantite' => 8.0,
+                'prix' => 3.0,
+            ],
+        ];
+
+        $resultat = $service->calculerValeurStock($stocks);
+
+        $this->assertEqualsWithDelta(66.50, $resultat, 0.001);
+    }
+
+    public function testCalculerCoefficientRepartition(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [
+            'carottes' => ['quantite' => 10.0, 'prix' => 2.0],
+            'pommes_de_terre' => ['quantite' => 15.0, 'prix' => 1.5],
+            'poireaux' => ['quantite' => 8.0, 'prix' => 3.0],
+        ];
+
+        $typesPaniers = [
+            ['nom' => 'Simple', 'nombre' => 10, 'valeurCible' => 5.0],
+            ['nom' => 'Familial', 'nombre' => 5, 'valeurCible' => 10.0],
+        ];
+
+        $coefficient = $service->calculerCoefficientRepartition(
+            $stocks,
+            $typesPaniers
+        );
+
+        $this->assertEqualsWithDelta(0.665, $coefficient, 0.000001);
+    }
+
+
+    public function testGenererCompositionEquitable(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [
+            'carottes' => ['quantite' => 10.0, 'prix' => 2.0],
+            'pommes_de_terre' => ['quantite' => 15.0, 'prix' => 1.5],
+            'poireaux' => ['quantite' => 8.0, 'prix' => 3.0],
+        ];
+
+        $typesPaniers = [
+            ['nom' => 'Simple', 'nombre' => 10, 'valeurCible' => 5.0],
+            ['nom' => 'Familial', 'nombre' => 5, 'valeurCible' => 10.0],
+        ];
+
+        $resultat = $service->genererCompositionEquitable(
+            $stocks,
+            $typesPaniers
+        );
+
+        $this->assertEqualsWithDelta(
+            0.665,
+            $resultat['coefficientRepartition'],
+            0.000001
+        );
+
+        $simple = $resultat['paniers']['Simple'];
+        $familial = $resultat['paniers']['Familial'];
+
+        // Les deux types atteignent une proportion similaire
+        // de leur valeur cible.
+        $this->assertEqualsWithDelta(
+            $simple['valeur'] / $simple['valeurCible'],
+            $familial['valeur'] / $familial['valeurCible'],
+            0.005
+        );
+
+        $this->assertEqualsWithDelta(3.325, $simple['valeur'], 0.01);
+        $this->assertEqualsWithDelta(6.65, $familial['valeur'], 0.01);
+
+        // Aucun stock négatif.
+        foreach ($resultat['stocksRestants'] as $stock) {
+            $this->assertGreaterThanOrEqual(
+                -0.000001,
+                $stock['quantite']
+            );
+        }
+    }
+
+
+
+
+
 
 }
 
