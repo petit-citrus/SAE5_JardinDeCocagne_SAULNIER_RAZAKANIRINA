@@ -257,6 +257,141 @@ public function testVerifierStocks(): void
         }
     }
 
+    public function testCoefficientAvecStockSuffisant(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [
+            'carottes' => [
+                'quantite' => 100.0,
+                'prix' => 2.0,
+            ],
+        ];
+
+        $typesPaniers = [
+            [
+                'nom' => 'Simple',
+                'nombre' => 10,
+                'valeurCible' => 5.0,
+            ],
+            [
+                'nom' => 'Familial',
+                'nombre' => 5,
+                'valeurCible' => 10.0,
+            ],
+        ];
+
+        $coefficient = $service->calculerCoefficientRepartition(
+            $stocks,
+            $typesPaniers
+        );
+
+        $this->assertEqualsWithDelta(
+            1.0,
+            $coefficient,
+            0.000001
+        );
+
+        $resultat = $service->genererCompositionEquitable(
+            $stocks,
+            $typesPaniers
+        );
+
+        $this->assertEqualsWithDelta(
+            5.0,
+            $resultat['paniers']['Simple']['valeur'],
+            0.01
+        );
+
+        $this->assertEqualsWithDelta(
+            10.0,
+            $resultat['paniers']['Familial']['valeur'],
+            0.01
+        );
+    }
+
+
+    public function testCompositionSansStock(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [];
+
+        $typesPaniers = [
+            [
+                'nom' => 'Simple',
+                'nombre' => 10,
+                'valeurCible' => 5.0,
+            ],
+        ];
+
+        $resultat = $service->genererCompositionEquitable(
+            $stocks,
+            $typesPaniers
+        );
+
+        $this->assertEqualsWithDelta(
+            0.0,
+            $resultat['coefficientRepartition'],
+            0.000001
+        );
+
+        $this->assertEquals(
+            [],
+            $resultat['paniers']['Simple']['composition']
+        );
+
+        $this->assertEqualsWithDelta(
+            0.0,
+            $resultat['paniers']['Simple']['valeur'],
+            0.001
+        );
+    }
+
+
+public function testInfluenceOrdreDesPaniers(): void
+{
+    $service = new CompositionPanierService();
+
+    $stocks = [
+        'carottes' => ['quantite' => 10.0, 'prix' => 2.0],
+        'pommes_de_terre' => ['quantite' => 15.0, 'prix' => 1.5],
+        'poireaux' => ['quantite' => 8.0, 'prix' => 3.0],
+    ];
+
+    $typesPaniers = [
+        ['nom' => 'Simple', 'nombre' => 10, 'valeurCible' => 5.0],
+        ['nom' => 'Familial', 'nombre' => 5, 'valeurCible' => 10.0],
+    ];
+
+    $resultatNormal = $service->genererCompositionEquitable(
+        $stocks,
+        $typesPaniers
+    );
+
+    $resultatInverse = $service->genererCompositionEquitable(
+        $stocks,
+        array_reverse($typesPaniers)
+    );
+
+    // Comparer la valeur obtenue pour chaque type.
+    $this->assertEqualsWithDelta(
+        $resultatNormal['paniers']['Simple']['valeur'],
+        $resultatInverse['paniers']['Simple']['valeur'],
+        0.01
+    );
+
+    $this->assertEqualsWithDelta(
+        $resultatNormal['paniers']['Familial']['valeur'],
+        $resultatInverse['paniers']['Familial']['valeur'],
+        0.01
+    );
+}
+
+
+
+
+
 
 
 
