@@ -6,102 +6,163 @@
 <main class="page-paniers">
 
     <header class="paniers-entete">
+        <p class="sous-titre">SAÉ 5 — Réseau Cocagne</p>
         <h1>Composition des paniers</h1>
         <p>
-            Proposition automatique de répartition
-            des légumes selon les stocks disponibles.
+            Renseignez les stocks et les quantités de paniers
+            à préparer pour générer une proposition.
         </p>
     </header>
 
     <section class="paniers-section">
-        <h2>Stocks disponibles</h2>
+        <h2>Préparer une composition</h2>
 
-        <table class="paniers-table">
-            <thead>
-                <tr>
-                    <th>Légume</th>
-                    <th>Quantité</th>
-                    <th>Prix unitaire</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for nom, stock in stocks %}
-                    <tr>
-                        <td>{{ nom|replace({'_': ' '})|capitalize }}</td>
-                        <td>{{ stock.quantite|number_format(2, ',', ' ') }} kg</td>
-                        <td>{{ stock.prix|number_format(2, ',', ' ') }} €/kg</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
-
-    <section class="paniers-section">
-        <h2>Compositions proposées</h2>
-
-        <p>
-            Coefficient de répartition :
-            <strong>
-                {{ (resultat.coefficientRepartition * 100)|number_format(1, ',', ' ') }} %
-            </strong>
-        </p>
-
-        {% for nom, panier in resultat.paniers %}
-            <article class="paniers-composition">
-                <h3>Panier {{ nom }}</h3>
-
-                <p>Nombre à préparer : {{ panier.nombre }}</p>
-
+        {% if erreurs is not empty %}
+            <div class="paniers-erreurs" role="alert">
+                <strong>Vérifiez les données saisies :</strong>
                 <ul>
-                    {% for legume, quantite in panier.composition %}
-                        <li>
-                            {{ legume|replace({'_': ' '})|capitalize }} :
-                            {{ quantite|number_format(3, ',', ' ') }} kg
-                            par panier
-                        </li>
-                    {% else %}
-                        <li>Aucun légume disponible.</li>
+                    {% for erreur in erreurs %}
+                        <li>{{ erreur }}</li>
                     {% endfor %}
                 </ul>
+            </div>
+        {% endif %}
 
-                <p>
-                    Valeur obtenue :
-                    <strong>
-                        {{ panier.valeur|number_format(2, ',', ' ') }} €
-                    </strong>
-                    /
-                    {{ panier.valeurCible|number_format(2, ',', ' ') }} €
-                </p>
-            </article>
-        {% endfor %}
-    </section>
+        <form method="post"
+      action="{{ path('app_paniers') }}"
+      data-turbo="false"
+      class="paniers-formulaire">
 
-    <section class="paniers-section">
-        <h2>Stocks restants</h2>
+            <h3>Stocks disponibles</h3>
 
-        <table class="paniers-table">
-            <thead>
-                <tr>
-                    <th>Légume</th>
-                    <th>Quantité restante</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for nom, stock in resultat.stocksRestants %}
-                    <tr>
-                        <td>{{ nom|replace({'_': ' '})|capitalize }}</td>
-                        <td>
-                            {{ stock.quantite|number_format(3, ',', ' ') }} kg
-                        </td>
-                    </tr>
+            <div class="paniers-champs">
+                {% for legume, quantite in quantites %}
+                    <div class="paniers-champ">
+                        <label for="stock-{{ legume }}">
+                            {{ legume|replace({'_': ' '})|capitalize }}
+                        </label>
+
+                        <input
+                            id="stock-{{ legume }}"
+                            type="number"
+                            name="stocks[{{ legume }}]"
+                            value="{{ quantite }}"
+                            min="0"
+                            max="1000000"
+                            step="0.01"
+                            required
+                        >
+
+                        <small>
+                            kg disponibles —
+                            {{ prix[legume]|number_format(2, ',', ' ') }} €/kg
+                        </small>
+                    </div>
                 {% endfor %}
-            </tbody>
-        </table>
+            </div>
+
+            <h3>Paniers à préparer</h3>
+
+            <div class="paniers-champs">
+                {% for nom, nombre in nombresPaniers %}
+                    <div class="paniers-champ">
+                        <label for="panier-{{ nom }}">
+                            Panier {{ nom }}
+                        </label>
+
+                        <input
+                            id="panier-{{ nom }}"
+                            type="number"
+                            name="paniers[{{ nom }}]"
+                            value="{{ nombre }}"
+                            min="0"
+                            max="100000"
+                            step="1"
+                            required
+                        >
+
+                        <small>
+                            Valeur cible :
+                            {{ valeursCibles[nom]|number_format(2, ',', ' ') }} €
+                        </small>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="paniers-bouton">
+                Générer les compositions
+            </button>
+        </form>
     </section>
 
-    <footer class="paniers-retour">
-        <a href="{{ path('app_home') }}">Retour à l'accueil</a>
-    </footer>
+    {% if resultat is not null %}
+        <section class="paniers-section">
+            <h2>Résultats de la répartition</h2>
+
+            <p>
+                Coefficient de répartition :
+                <strong>
+                    {{ (resultat.coefficientRepartition * 100)
+                        |number_format(1, ',', ' ') }} %
+                </strong>
+            </p>
+
+            {% for nom, panier in resultat.paniers %}
+                <article class="paniers-composition">
+                    <h3>Panier {{ nom }}</h3>
+
+                    <p>Nombre à préparer : {{ panier.nombre }}</p>
+
+                    <ul>
+                        {% for legume, quantite in panier.composition %}
+                            <li>
+                                {{ legume|replace({'_': ' '})|capitalize }} :
+                                {{ quantite|number_format(3, ',', ' ') }}
+                                kg par panier
+                            </li>
+                        {% else %}
+                            <li>Aucun légume attribué.</li>
+                        {% endfor %}
+                    </ul>
+
+                    <p>
+                        Valeur obtenue :
+                        <strong>
+                            {{ panier.valeur|number_format(2, ',', ' ') }} €
+                        </strong>
+                        /
+                        {{ panier.valeurCible|number_format(2, ',', ' ') }} €
+                    </p>
+                </article>
+            {% endfor %}
+        </section>
+
+        <section class="paniers-section">
+            <h2>Stocks restants</h2>
+
+            <table class="paniers-table">
+                <thead>
+                    <tr>
+                        <th>Légume</th>
+                        <th>Quantité restante</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for nom, stock in resultat.stocksRestants %}
+                        <tr>
+                            <td>
+                                {{ nom|replace({'_': ' '})|capitalize }}
+                            </td>
+                            <td>
+                                {{ stock.quantite|number_format(3, ',', ' ') }}
+                                kg
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% endif %}
 
 </main>
 {% endblock %}
