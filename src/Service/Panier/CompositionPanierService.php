@@ -37,5 +37,23 @@ class CompositionPanierService
         return $total;
     }
 
+    public function verifierStocks(array $stocks, array $besoins): array
+    {
+        $resultats = [];
+
+        foreach ($besoins as $legume => $quantiteNecessaire) {
+            $stockDisponible = $stocks[$legume] ?? 0;
+
+            $resultats[$legume] = [
+                'suffisant' => $quantiteNecessaire <= $stockDisponible,
+                'manquant' => max(0, $quantiteNecessaire - $stockDisponible),
+                'restant' => max(0, $stockDisponible - $quantiteNecessaire),
+            ];
+        }
+
+        return $resultats;
+    }
+
+
 
 }

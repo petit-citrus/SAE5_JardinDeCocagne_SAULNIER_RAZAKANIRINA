@@ -63,6 +63,36 @@ class CompositionPanierServiceTest extends TestCase
         $this->assertEquals(10.0, $resultat);
     }
 
+    
+public function testVerifierStocks(): void
+{
+    $service = new CompositionPanierService();
+
+    $stocks = [
+        'carottes' => 30,
+        'pommes_de_terre' => 40,
+        'poireaux' => 8,
+    ];
+
+    $besoins = [
+        'carottes' => 10,
+        'pommes_de_terre' => 15,
+        'poireaux' => 10,
+    ];
+
+    $resultats = $service->verifierStocks($stocks, $besoins);
+
+    $this->assertTrue($resultats['carottes']['suffisant']);
+    $this->assertEquals(20, $resultats['carottes']['restant']);
+
+    $this->assertTrue($resultats['pommes_de_terre']['suffisant']);
+    $this->assertEquals(25, $resultats['pommes_de_terre']['restant']);
+
+    $this->assertFalse($resultats['poireaux']['suffisant']);
+    $this->assertEquals(2, $resultats['poireaux']['manquant']);
+}
+
+
 
 }
 
