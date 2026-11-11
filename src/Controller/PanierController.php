@@ -39,27 +39,60 @@ class PanierController extends AbstractController
             'Familial' => 10.0,
         ];
 
+        // 3. Méthode de répartition sélectionnée par défaut.
+        $methodeRepartition = 'equitable';
+
+        $methodesAutorisees = [
+            'equitable',
+            'homogene',
+        ];
+
+        // 4. Initialisation des résultats et des erreurs.
         $erreurs = [];
         $resultat = null;
         $analyseDiversite = [];
 
+        // 5. Traitement des données envoyées par le formulaire.
         if ($request->isMethod('POST')) {
-    $token = $request->request->get('_csrf_token', '');
 
-        if (
-            !is_string($token)
-            || !$this->isCsrfTokenValid('composition_paniers', $token)
-        ) {
-            $erreurs[] = 'Jeton de sécurité invalide. Veuillez réessayer.';
-        }
-    }
+            // Vérification du jeton CSRF.
+            $token = $request->request->get('_csrf_token', '');
 
-        // 3. Récupération des données envoyées par le formulaire.
-        if ($request->isMethod('POST')) {
+            if (
+                !is_string($token)
+                || !$this->isCsrfTokenValid(
+                    'composition_paniers',
+                    $token
+                )
+            ) {
+                $erreurs[] =
+                    'Jeton de sécurité invalide. Veuillez réessayer.';
+            }
+
+            // Récupération des données du formulaire.
             $quantitesEnvoyees = $request->request->all('stocks');
             $paniersEnvoyes = $request->request->all('paniers');
 
-            // Mettre à jour les quantités de légumes.
+            // Récupération de la méthode de répartition.
+            $methodeEnvoyee = $request->request->get(
+                'methode_repartition',
+                ''
+            );
+
+            if (
+                !is_string($methodeEnvoyee)
+                || !in_array(
+                    $methodeEnvoyee,
+                    $methodesAutorisees,
+                    true
+                )
+            ) {
+                $erreurs[] = 'Méthode de répartition invalide.';
+            } else {
+                $methodeRepartition = $methodeEnvoyee;
+            }
+
+            // Mise à jour des quantités de légumes.
             foreach ($quantites as $legume => $valeurParDefaut) {
                 $saisie = $quantitesEnvoyees[$legume] ?? '';
 
@@ -68,7 +101,7 @@ class PanierController extends AbstractController
                     : '';
             }
 
-            // Mettre à jour les nombres de paniers.
+            // Mise à jour du nombre de paniers.
             foreach ($nombresPaniers as $nom => $valeurParDefaut) {
                 $saisie = $paniersEnvoyes[$nom] ?? '';
 
@@ -78,13 +111,7 @@ class PanierController extends AbstractController
             }
         }
 
-    //     dd([
-    // 'methode' => $request->getMethod(),
-    // 'quantites_apres_POST' => $quantites,
-    // 'nombres_paniers' => $nombresPaniers,
-    //         ]);
-
-        // 4. Validation et construction des stocks.
+        // 6. Validation et construction du tableau des stocks.
         $stocks = [];
 
         foreach ($quantites as $legume => $saisie) {
@@ -99,7 +126,8 @@ class PanierController extends AbstractController
                 || $quantite < 0
                 || $quantite > 1000000
             ) {
-                $erreurs[] = "Quantité invalide pour : "
+                $erreurs[] =
+                    'Quantité invalide pour : '
                     . str_replace('_', ' ', $legume);
 
                 continue;
@@ -111,7 +139,7 @@ class PanierController extends AbstractController
             ];
         }
 
-        // 5. Validation et construction des types de paniers.
+        // 7. Validation et construction des types de paniers.
         $typesPaniers = [];
 
         foreach ($nombresPaniers as $nom => $saisie) {
@@ -125,7 +153,8 @@ class PanierController extends AbstractController
                 || $nombre < 0
                 || $nombre > 100000
             ) {
-                $erreurs[] = "Nombre de paniers invalide : " . $nom;
+                $erreurs[] =
+                    'Nombre de paniers invalide : ' . $nom;
 
                 continue;
             }
@@ -137,25 +166,42 @@ class PanierController extends AbstractController
             ];
         }
 
-        // 6. Génération des compositions si les données sont valides.
-        
+        // 8. Génération de la composition selon la méthode choisie.
         if (empty($erreurs)) {
-            $resultat = $compositionService
-                ->genererCompositionEquitable(
-                    $stocks,
-                    $typesPaniers
-                );
 
+            if ($methodeRepartition === 'homogene') {
+
+                // Nouvelle méthode : répartition des mêmes légumes
+                // entre les différents types de paniers.
+                $resultat = $compositionService
+                    ->genererCompositionHomogene(
+                        $stocks,
+                        $typesPaniers
+                    );
+
+            } else {
+
+                // Méthode précédente : répartition équitable
+                // selon les valeurs cibles.
+                $resultat = $compositionService
+                    ->genererCompositionEquitable(
+                        $stocks,
+                        $typesPaniers
+                    );
+            }
+
+            // 9. Analyse de la diversité des compositions.
             $analyseDiversite = $compositionService
                 ->analyserDiversite($resultat);
         }
 
-        // 7. Affichage des données et des résultats dans Twig.
+        // 10. Envoi des données et des résultats au template Twig.
         return $this->render('paniers/index.html.twig', [
             'prix' => $prix,
             'quantites' => $quantites,
             'nombresPaniers' => $nombresPaniers,
             'valeursCibles' => $valeursCibles,
+            'methodeRepartition' => $methodeRepartition,
             'erreurs' => $erreurs,
             'resultat' => $resultat,
             'analyseDiversite' => $analyseDiversite,

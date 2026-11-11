@@ -95,6 +95,32 @@
                 {% endfor %}
             </div>
 
+            <div class="paniers-methode">
+                <label for="methode-repartition">
+                    Méthode de répartition
+                </label>
+
+                <select
+                    id="methode-repartition"
+                    name="methode_repartition"
+                    required
+                >
+                    <option
+                        value="equitable"
+                        {% if methodeRepartition == 'equitable' %}selected{% endif %}
+                    >
+                        Répartition équitable
+                    </option>
+
+                    <option
+                        value="homogene"
+                        {% if methodeRepartition == 'homogene' %}selected{% endif %}
+                    >
+                        Répartition homogène
+                    </option>
+                </select>
+            </div>
+
             <button type="submit" class="paniers-bouton">
                 Générer les compositions
             </button>

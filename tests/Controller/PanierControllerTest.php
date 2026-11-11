@@ -110,6 +110,7 @@ class PanierControllerTest extends WebTestCase
         // Envoyer une quantité négative avec un jeton valide.
         $client->request('POST', '/paniers', [
             '_csrf_token' => $token,
+            'methode_repartition' => 'equitable',
             'stocks' => [
                 'carottes' => '-5',
                 'pommes_de_terre' => '15',
@@ -140,6 +141,7 @@ class PanierControllerTest extends WebTestCase
 
         // Envoyer une requête POST sans jeton CSRF.
         $client->request('POST', '/paniers', [
+            'methode_repartition' => 'equitable',
             'stocks' => [
                 'carottes' => '10',
                 'pommes_de_terre' => '15',
@@ -194,6 +196,52 @@ class PanierControllerTest extends WebTestCase
             '.paniers-diversite-ok'
         );
     }
+
+
+public function testFormulaireAvecRepartitionHomogene(): void
+{
+    $client = static::createClient();
+
+    // Ouvrir le formulaire.
+    $client->request('GET', '/paniers');
+
+    // Choisir la répartition homogène.
+    $client->submitForm('Générer les compositions', [
+        'stocks[carottes]' => '10',
+        'stocks[pommes_de_terre]' => '15',
+        'stocks[poireaux]' => '8',
+        'paniers[Simple]' => '10',
+        'paniers[Familial]' => '5',
+        'methode_repartition' => 'homogene',
+    ]);
+
+    // La page doit répondre correctement.
+    $this->assertResponseIsSuccessful();
+
+    // Les deux types doivent contenir trois légumes.
+    $this->assertSelectorCount(
+        2,
+        '.paniers-diversite-ok'
+    );
+
+    // Vérifier les quantités de la nouvelle répartition.
+    $this->assertSelectorTextContains(
+        '#resultats-paniers',
+        '0,500 kg'
+    );
+
+    $this->assertSelectorTextContains(
+        '#resultats-paniers',
+        '1,000 kg'
+    );
+
+    // Vérifier le coefficient.
+    $this->assertSelectorTextContains(
+        '#resultats-paniers',
+        '66,5 %'
+    );
+}
+
 
 
 
