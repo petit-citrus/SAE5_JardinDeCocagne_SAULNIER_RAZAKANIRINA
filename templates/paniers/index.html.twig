@@ -117,6 +117,23 @@
                 <article class="paniers-composition">
                     <h3>Panier {{ nom }}</h3>
 
+                    {% if analyseDiversite[nom] is defined %}
+                        {% set analyse = analyseDiversite[nom] %}
+
+                        {% if analyse.diversiteSuffisante %}
+                            <p class="paniers-diversite-ok">
+                                Diversité suffisante :
+                                {{ analyse.nombreLegumes }} légumes différents.
+                            </p>
+                        {% else %}
+                            <p class="paniers-diversite-alerte">
+                                Diversité insuffisante :
+                                {{ analyse.nombreLegumes }} légume(s) différent(s).
+                                Minimum souhaité : {{ analyse.minimumLegumes }}.
+                            </p>
+                        {% endif %}
+                    {% endif %}
+
                     <p>Nombre à préparer : {{ panier.nombre }}</p>
 
                     <ul>

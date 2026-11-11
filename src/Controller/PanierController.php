@@ -41,6 +41,7 @@ class PanierController extends AbstractController
 
         $erreurs = [];
         $resultat = null;
+        $analyseDiversite = [];
 
         if ($request->isMethod('POST')) {
     $token = $request->request->get('_csrf_token', '');
@@ -137,12 +138,16 @@ class PanierController extends AbstractController
         }
 
         // 6. Génération des compositions si les données sont valides.
+        
         if (empty($erreurs)) {
             $resultat = $compositionService
                 ->genererCompositionEquitable(
                     $stocks,
                     $typesPaniers
                 );
+
+            $analyseDiversite = $compositionService
+                ->analyserDiversite($resultat);
         }
 
         // 7. Affichage des données et des résultats dans Twig.
@@ -153,6 +158,7 @@ class PanierController extends AbstractController
             'valeursCibles' => $valeursCibles,
             'erreurs' => $erreurs,
             'resultat' => $resultat,
+            'analyseDiversite' => $analyseDiversite,
         ]);
     }
 }

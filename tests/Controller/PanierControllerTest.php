@@ -165,5 +165,36 @@ class PanierControllerTest extends WebTestCase
         );
     }
 
+    public function testAffichageDiversiteInsuffisante(): void
+    {
+        $client = static::createClient();
+
+        // Ouvrir le formulaire.
+        $client->request('GET', '/paniers');
+
+        // Générer des paniers avec uniquement des carottes.
+        $client->submitForm('Générer les compositions', [
+            'stocks[carottes]' => '100',
+            'stocks[pommes_de_terre]' => '0',
+            'stocks[poireaux]' => '0',
+            'paniers[Simple]' => '10',
+            'paniers[Familial]' => '5',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        // Les deux types de paniers doivent afficher une alerte.
+        $this->assertSelectorCount(
+            2,
+            '.paniers-diversite-alerte'
+        );
+
+        // Aucun panier ne doit être déclaré suffisamment diversifié.
+        $this->assertSelectorNotExists(
+            '.paniers-diversite-ok'
+        );
+    }
+
+
 
 }
