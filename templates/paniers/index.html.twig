@@ -33,6 +33,12 @@
       data-turbo="false"
       class="paniers-formulaire">
 
+      <input
+            type="hidden"
+            name="_csrf_token"
+            value="{{ csrf_token('composition_paniers') }}"
+        >
+
             <h3>Stocks disponibles</h3>
 
             <div class="paniers-champs">

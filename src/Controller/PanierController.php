@@ -42,6 +42,17 @@ class PanierController extends AbstractController
         $erreurs = [];
         $resultat = null;
 
+        if ($request->isMethod('POST')) {
+    $token = $request->request->get('_csrf_token', '');
+
+        if (
+            !is_string($token)
+            || !$this->isCsrfTokenValid('composition_paniers', $token)
+        ) {
+            $erreurs[] = 'Jeton de sécurité invalide. Veuillez réessayer.';
+        }
+    }
+
         // 3. Récupération des données envoyées par le formulaire.
         if ($request->isMethod('POST')) {
             $quantitesEnvoyees = $request->request->all('stocks');

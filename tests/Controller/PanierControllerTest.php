@@ -98,7 +98,18 @@ class PanierControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
+        // Ouvrir le formulaire pour récupérer son jeton CSRF.
+        $crawler = $client->request('GET', '/paniers');
+
+        $token = $crawler
+            ->filter('input[name="_csrf_token"]')
+            ->attr('value');
+
+        $this->assertNotEmpty($token);
+
+        // Envoyer une quantité négative avec un jeton valide.
         $client->request('POST', '/paniers', [
+            '_csrf_token' => $token,
             'stocks' => [
                 'carottes' => '-5',
                 'pommes_de_terre' => '15',
@@ -110,19 +121,49 @@ class PanierControllerTest extends WebTestCase
             ],
         ]);
 
-        // Le serveur répond, mais refuse les données invalides.
         $this->assertResponseIsSuccessful();
 
-        // Un message d'erreur doit être affiché.
         $this->assertSelectorTextContains(
             '.paniers-erreurs',
             'Quantité invalide pour : carottes'
         );
 
-        // Aucun résultat ne doit être généré.
         $this->assertSelectorNotExists(
             '#resultats-paniers'
         );
     }
+
+    // Test 5 : vérifier une soumission sans jeton CSRF.
+    public function testFormulaireSansJetonCsrf(): void
+    {
+        $client = static::createClient();
+
+        // Envoyer une requête POST sans jeton CSRF.
+        $client->request('POST', '/paniers', [
+            'stocks' => [
+                'carottes' => '10',
+                'pommes_de_terre' => '15',
+                'poireaux' => '8',
+            ],
+            'paniers' => [
+                'Simple' => '10',
+                'Familial' => '5',
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        // Vérifier que le serveur refuse la soumission.
+        $this->assertSelectorTextContains(
+            '.paniers-erreurs',
+            'Jeton de sécurité invalide'
+        );
+
+        // Vérifier qu'aucune composition n'est générée.
+        $this->assertSelectorNotExists(
+            '#resultats-paniers'
+        );
+    }
+
 
 }
