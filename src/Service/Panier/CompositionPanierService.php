@@ -302,10 +302,29 @@ class CompositionPanierService
                     continue;
                 }
 
-                $quantiteParPanier =
+                
+                $quantiteTheorique =
                     $infos['quantite']
                     * $valeurCible
                     / $denominateur;
+
+                // Si le produit possède un pas de distribution,
+                // ajuster la quantité à un multiple de ce pas.
+                if (isset($infos['pasDistribution'])) {
+                    $quantiteParPanier = $this->ajusterQuantite(
+                        $quantiteTheorique,
+                        (float) $infos['pasDistribution']
+                    );
+                } else {
+                    // Compatibilité avec nos anciens jeux de données.
+                    $quantiteParPanier = $quantiteTheorique;
+                }
+
+                // Ne pas ajouter un légume qui n'est pas distribué.
+                if ($quantiteParPanier <= 0) {
+                    continue;
+                }
+
 
                 $composition[$legume] = $quantiteParPanier;
 

@@ -28,6 +28,12 @@ class PanierController extends AbstractController
             'poireaux' => 'kg',
         ];
 
+        $pasDistribution = [
+            'carottes' => 0.1,
+            'pommes_de_terre' => 0.25,
+            'poireaux' => 0.1,
+        ];
+
         // 2. Valeurs initiales affichées dans le formulaire.
         $quantites = [
             'carottes' => '10',
@@ -143,6 +149,7 @@ class PanierController extends AbstractController
                 'quantite' => $quantite,
                 'prix' => $prix[$legume],
                 'unite' => $unites[$legume],
+                'pasDistribution' => $pasDistribution[$legume] ?? null,
             ];
         }
 

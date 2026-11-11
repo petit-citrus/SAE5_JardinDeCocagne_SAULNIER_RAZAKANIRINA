@@ -648,7 +648,99 @@ public function testInfluenceOrdreDesPaniers(): void
         $service->ajusterQuantite(2.5, 0.0);
     }
 
+    public function testCompositionHomogeneAvecProduitEntier(): void
+    {
+        $service = new CompositionPanierService();
 
+        $stocks = [
+            'salades' => [
+                'quantite' => 4.0,
+                'prix' => 2.0,
+                'unite' => 'piece',
+                'pasDistribution' => 1.0,
+            ],
+        ];
+
+        $typesPaniers = [
+            [
+                'nom' => 'Simple',
+                'nombre' => 10,
+                'valeurCible' => 5.0,
+            ],
+        ];
+
+        $resultat = $service->genererCompositionHomogene(
+            $stocks,
+            $typesPaniers
+        );
+
+        // Il n'y a pas assez de salades pour en donner
+        // une entière à chacun des dix paniers.
+        $this->assertArrayNotHasKey(
+            'salades',
+            $resultat['paniers']['Simple']['composition']
+        );
+
+        // Aucune salade ne doit être déduite du stock.
+        $this->assertEqualsWithDelta(
+            4.0,
+            $resultat['stocksRestants']['salades']['quantite'],
+            0.000001
+        );
+
+        $this->assertEqualsWithDelta(
+            0.0,
+            $resultat['paniers']['Simple']['valeur'],
+            0.001
+        );
+    }
+    public function testCompositionHomogeneAvecPasEnKg(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [
+            'carottes' => [
+                'quantite' => 10.0,
+                'prix' => 2.0,
+                'unite' => 'kg',
+                'pasDistribution' => 0.25,
+            ],
+        ];
+
+        $typesPaniers = [
+            [
+                'nom' => 'Simple',
+                'nombre' => 6,
+                'valeurCible' => 3.0,
+            ],
+        ];
+
+        $resultat = $service->genererCompositionHomogene(
+            $stocks,
+            $typesPaniers
+        );
+
+        // Quantité théorique : 1,5 kg par panier.
+        // Elle respecte déjà le pas de 0,25 kg.
+        $this->assertEqualsWithDelta(
+            1.5,
+            $resultat['paniers']['Simple']['composition']['carottes'],
+            0.000001
+        );
+
+        // Six paniers utilisent 9 kg au total.
+        $this->assertEqualsWithDelta(
+            1.0,
+            $resultat['stocksRestants']['carottes']['quantite'],
+            0.000001
+        );
+
+        $this->assertEqualsWithDelta(
+            3.0,
+            $resultat['paniers']['Simple']['valeur'],
+            0.001
+        );
+    }
 
 
 
