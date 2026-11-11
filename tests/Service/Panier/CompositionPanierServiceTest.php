@@ -538,6 +538,54 @@ public function testInfluenceOrdreDesPaniers(): void
             0.000001
         );
     }
+    public function testCompositionAvecUnites(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [
+            'carottes' => [
+                'quantite' => 10.0,
+                'prix' => 2.0,
+                'unite' => 'kg',
+            ],
+            'salades' => [
+                'quantite' => 5.0,
+                'prix' => 1.5,
+                'unite' => 'piece',
+            ],
+        ];
+
+        $typesPaniers = [
+            [
+                'nom' => 'Simple',
+                'nombre' => 5,
+                'valeurCible' => 5.0,
+            ],
+        ];
+
+        $resultat = $service->genererCompositionHomogene(
+            $stocks,
+            $typesPaniers
+        );
+
+        // La composition doit bien être générée.
+        $this->assertArrayHasKey(
+            'Simple',
+            $resultat['paniers']
+        );
+
+        // Les unités doivent être conservées dans les stocks restants.
+        $this->assertEquals(
+            'kg',
+            $resultat['stocksRestants']['carottes']['unite']
+        );
+
+        $this->assertEquals(
+            'piece',
+            $resultat['stocksRestants']['salades']['unite']
+        );
+    }
+
 
 
 

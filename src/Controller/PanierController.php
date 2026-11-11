@@ -22,6 +22,12 @@ class PanierController extends AbstractController
             'poireaux' => 3.0,
         ];
 
+        $unites = [
+            'carottes' => 'kg',
+            'pommes_de_terre' => 'kg',
+            'poireaux' => 'kg',
+        ];
+
         // 2. Valeurs initiales affichées dans le formulaire.
         $quantites = [
             'carottes' => '10',
@@ -136,6 +142,7 @@ class PanierController extends AbstractController
             $stocks[$legume] = [
                 'quantite' => $quantite,
                 'prix' => $prix[$legume],
+                'unite' => $unites[$legume],
             ];
         }
 
@@ -205,6 +212,7 @@ class PanierController extends AbstractController
             'erreurs' => $erreurs,
             'resultat' => $resultat,
             'analyseDiversite' => $analyseDiversite,
+            'unites' => $unites,
         ]);
     }
 }

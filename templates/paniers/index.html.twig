@@ -60,8 +60,9 @@
                         >
 
                         <small>
-                            kg disponibles —
-                            {{ prix[legume]|number_format(2, ',', ' ') }} €/kg
+                            {{ unites[legume] }} disponibles —
+                            {{ prix[legume]|number_format(2, ',', ' ') }}
+                            €/{{ unites[legume] }}
                         </small>
                     </div>
                 {% endfor %}
@@ -167,7 +168,7 @@
                             <li>
                                 {{ legume|replace({'_': ' '})|capitalize }} :
                                 {{ quantite|number_format(3, ',', ' ') }}
-                                kg par panier
+                                {{ unites[legume] }} par panier
                             </li>
                         {% else %}
                             <li>Aucun légume attribué.</li>
@@ -204,7 +205,7 @@
                             </td>
                             <td>
                                 {{ stock.quantite|number_format(3, ',', ' ') }}
-                                kg
+                                {{ unites[nom] }}
                             </td>
                         </tr>
                     {% endfor %}
