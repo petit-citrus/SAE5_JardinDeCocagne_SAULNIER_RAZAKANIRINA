@@ -213,6 +213,45 @@ class CompositionPanierService
         return $resultat;
     }
 
+    public function analyserDiversite(
+        array $resultat,
+        int $minimumLegumes = 2
+    ): array {
+        if ($minimumLegumes < 1) {
+            throw new \InvalidArgumentException(
+                'Le minimum de légumes doit être positif.'
+            );
+        }
+
+        $analyse = [];
+
+        foreach ($resultat['paniers'] as $nom => $panier) {
+            // Ignorer les types pour lesquels aucun panier
+            // n'est demandé.
+            if ($panier['nombre'] <= 0) {
+                continue;
+            }
+
+            $nombreLegumes = 0;
+
+            foreach ($panier['composition'] as $quantite) {
+                if ($quantite > 0) {
+                    $nombreLegumes++;
+                }
+            }
+
+            $analyse[$nom] = [
+                'nombreLegumes' => $nombreLegumes,
+                'minimumLegumes' => $minimumLegumes,
+                'diversiteSuffisante' =>
+                    $nombreLegumes >= $minimumLegumes,
+            ];
+        }
+
+        return $analyse;
+    }
+
+
 
 
 

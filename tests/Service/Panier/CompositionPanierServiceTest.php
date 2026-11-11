@@ -389,6 +389,63 @@ public function testInfluenceOrdreDesPaniers(): void
 }
 
 
+    public function testDiversiteInsuffisante(): void
+    {
+        $service = new CompositionPanierService();
+
+        $resultat = [
+            'paniers' => [
+                'Simple' => [
+                    'nombre' => 10,
+                    'composition' => [
+                        'carottes' => 2.5,
+                    ],
+                ],
+            ],
+        ];
+
+        $analyse = $service->analyserDiversite($resultat);
+
+        $this->assertEquals(
+            1,
+            $analyse['Simple']['nombreLegumes']
+        );
+
+        $this->assertFalse(
+            $analyse['Simple']['diversiteSuffisante']
+        );
+    }
+
+    public function testDiversiteSuffisante(): void
+    {
+        $service = new CompositionPanierService();
+
+        $resultat = [
+            'paniers' => [
+                'Simple' => [
+                    'nombre' => 10,
+                    'composition' => [
+                        'carottes' => 1.0,
+                        'pommes_de_terre' => 1.5,
+                        'poireaux' => 0.25,
+                    ],
+                ],
+            ],
+        ];
+
+        $analyse = $service->analyserDiversite($resultat);
+
+        $this->assertEquals(
+            3,
+            $analyse['Simple']['nombreLegumes']
+        );
+
+        $this->assertTrue(
+            $analyse['Simple']['diversiteSuffisante']
+        );
+    }
+
+
 
 
 
