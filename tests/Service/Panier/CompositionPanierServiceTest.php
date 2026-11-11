@@ -586,6 +586,68 @@ public function testInfluenceOrdreDesPaniers(): void
         );
     }
 
+    public function testAjusterQuantiteEnKg(): void
+    {
+        $service = new CompositionPanierService();
+
+        $resultat = $service->ajusterQuantite(0.733, 0.1);
+
+        $this->assertEqualsWithDelta(
+            0.7,
+            $resultat,
+            0.000001
+        );
+    }
+
+    public function testAjusterQuantiteParQuartDeKg(): void
+    {
+        $service = new CompositionPanierService();
+
+        $resultat = $service->ajusterQuantite(1.38, 0.25);
+
+        $this->assertEqualsWithDelta(
+            1.25,
+            $resultat,
+            0.000001
+        );
+    }
+
+    public function testAjusterQuantiteEnPieces(): void
+    {
+        $service = new CompositionPanierService();
+
+        $resultat = $service->ajusterQuantite(0.4, 1.0);
+
+        $this->assertEqualsWithDelta(
+            0.0,
+            $resultat,
+            0.000001
+        );
+    }
+
+    public function testAjusterQuantiteEnBottes(): void
+    {
+        $service = new CompositionPanierService();
+
+        $resultat = $service->ajusterQuantite(2.8, 1.0);
+
+        $this->assertEqualsWithDelta(
+            2.0,
+            $resultat,
+            0.000001
+        );
+    }
+    public function testAjusterQuantiteAvecPasInvalide(): void
+    {
+        $service = new CompositionPanierService();
+
+        $this->expectException(
+            \InvalidArgumentException::class
+        );
+
+        $service->ajusterQuantite(2.5, 0.0);
+    }
+
 
 
 

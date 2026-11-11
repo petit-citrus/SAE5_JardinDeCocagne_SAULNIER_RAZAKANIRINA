@@ -342,7 +342,30 @@ class CompositionPanierService
             'coefficientRepartition' => $coefficient,
         ];
     }
+    public function ajusterQuantite(
+        float $quantite,
+        float $pasDistribution
+    ): float {
+        if (!is_finite($quantite) || $quantite < 0) {
+            throw new \InvalidArgumentException(
+                'La quantité doit être positive ou nulle.'
+            );
+        }
 
+        if (!is_finite($pasDistribution) || $pasDistribution <= 0) {
+            throw new \InvalidArgumentException(
+                'Le pas de distribution doit être supérieur à zéro.'
+            );
+        }
+
+        // Nombre de pas complets pouvant être distribués.
+        $nombrePas = floor(
+            round($quantite / $pasDistribution, 9)
+        );
+
+        // Quantité réellement distribuable.
+        return round($nombrePas * $pasDistribution, 6);
+    }
 
 
 
