@@ -251,6 +251,99 @@ class CompositionPanierService
         return $analyse;
     }
 
+    public function genererCompositionHomogene(
+        array $stocks,
+        array $typesPaniers
+    ): array {
+        // 1. Calculer la valeur du stock disponible.
+        $valeurStock = $this->calculerValeurStock($stocks);
+
+        // 2. Calculer la valeur totale demandée.
+        $valeurDemandee = 0.0;
+
+        foreach ($typesPaniers as $type) {
+            $valeurDemandee +=
+                $type['nombre'] * $type['valeurCible'];
+        }
+
+        // 3. Calculer le coefficient de répartition.
+        $coefficient = $this->calculerCoefficientRepartition(
+            $stocks,
+            $typesPaniers
+        );
+
+        // Éviter les divisions par zéro.
+        $denominateur = max($valeurStock, $valeurDemandee);
+
+        $compositions = [];
+        $stocksRestants = $stocks;
+
+        // 4. Préparer chaque type de panier.
+        foreach ($typesPaniers as $type) {
+            $nom = $type['nom'];
+            $nombre = $type['nombre'];
+            $valeurCible = $type['valeurCible'];
+
+            if ($nombre <= 0) {
+                continue;
+            }
+
+            $composition = [];
+            $valeurActuelle = 0.0;
+
+            // 5. Répartir chaque légume proportionnellement.
+            foreach ($stocks as $legume => $infos) {
+                if (
+                    $denominateur <= 0
+                    || $infos['quantite'] <= 0
+                    || $infos['prix'] <= 0
+                    || $valeurCible <= 0
+                ) {
+                    continue;
+                }
+
+                $quantiteParPanier =
+                    $infos['quantite']
+                    * $valeurCible
+                    / $denominateur;
+
+                $composition[$legume] = $quantiteParPanier;
+
+                $valeurActuelle +=
+                    $quantiteParPanier * $infos['prix'];
+
+                // Déduire la quantité utilisée pour ce type.
+                $stocksRestants[$legume]['quantite'] -=
+                    $quantiteParPanier * $nombre;
+            }
+
+            $compositions[$nom] = [
+                'nombre' => $nombre,
+                'composition' => $composition,
+                'valeur' => round($valeurActuelle, 2),
+                'valeurCible' => $valeurCible,
+                'valeurCibleAjustee' =>
+                    $valeurCible * $coefficient,
+            ];
+        }
+
+        // Corriger les très petites erreurs de calcul décimal.
+        foreach ($stocksRestants as &$stock) {
+            $stock['quantite'] = max(
+                0.0,
+                $stock['quantite']
+            );
+        }
+        unset($stock);
+
+        return [
+            'paniers' => $compositions,
+            'stocksRestants' => $stocksRestants,
+            'coefficientRepartition' => $coefficient,
+        ];
+    }
+
+
 
 
 

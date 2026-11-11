@@ -444,6 +444,102 @@ public function testInfluenceOrdreDesPaniers(): void
             $analyse['Simple']['diversiteSuffisante']
         );
     }
+    public function testCompositionHomogeneAvecStockInsuffisant(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [
+            'carottes' => ['quantite' => 10.0, 'prix' => 2.0],
+            'pommes_de_terre' => ['quantite' => 15.0, 'prix' => 1.5],
+            'poireaux' => ['quantite' => 8.0, 'prix' => 3.0],
+        ];
+
+        $typesPaniers = [
+            ['nom' => 'Simple', 'nombre' => 10, 'valeurCible' => 5.0],
+            ['nom' => 'Familial', 'nombre' => 5, 'valeurCible' => 10.0],
+        ];
+
+        $resultat = $service->genererCompositionHomogene(
+            $stocks,
+            $typesPaniers
+        );
+
+        $simple = $resultat['paniers']['Simple'];
+        $familial = $resultat['paniers']['Familial'];
+
+        $this->assertCount(3, $simple['composition']);
+        $this->assertCount(3, $familial['composition']);
+
+        $this->assertEqualsWithDelta(
+            0.5,
+            $simple['composition']['carottes'],
+            0.000001
+        );
+
+        $this->assertEqualsWithDelta(
+            1.0,
+            $familial['composition']['carottes'],
+            0.000001
+        );
+
+        $this->assertEqualsWithDelta(
+            3.33,
+            $simple['valeur'],
+            0.01
+        );
+
+        $this->assertEqualsWithDelta(
+            6.65,
+            $familial['valeur'],
+            0.01
+        );
+
+        foreach ($resultat['stocksRestants'] as $stock) {
+            $this->assertGreaterThanOrEqual(
+                -0.000001,
+                $stock['quantite']
+            );
+        }
+    }
+
+    public function testCompositionHomogeneAvecStockSuffisant(): void
+    {
+        $service = new CompositionPanierService();
+
+        $stocks = [
+            'carottes' => ['quantite' => 100.0, 'prix' => 2.0],
+        ];
+
+        $typesPaniers = [
+            ['nom' => 'Simple', 'nombre' => 10, 'valeurCible' => 5.0],
+            ['nom' => 'Familial', 'nombre' => 5, 'valeurCible' => 10.0],
+        ];
+
+        $resultat = $service->genererCompositionHomogene(
+            $stocks,
+            $typesPaniers
+        );
+
+        $this->assertEqualsWithDelta(
+            2.5,
+            $resultat['paniers']['Simple']['composition']['carottes'],
+            0.000001
+        );
+
+        $this->assertEqualsWithDelta(
+            5.0,
+            $resultat['paniers']['Familial']['composition']['carottes'],
+            0.000001
+        );
+
+        $this->assertEqualsWithDelta(
+            50.0,
+            $resultat['stocksRestants']['carottes']['quantite'],
+            0.000001
+        );
+    }
+
+
 
 
 
