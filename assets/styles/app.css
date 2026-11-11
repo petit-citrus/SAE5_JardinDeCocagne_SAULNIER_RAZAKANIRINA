@@ -106,3 +106,258 @@ h2 {
     font-weight: 400;
     letter-spacing: 0.1px;
 }
+
+
+/* Module de composition des paniers */
+
+.page-paniers {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+}
+
+.paniers-entete {
+    padding-bottom: 28px;
+    border-bottom: 1px solid #dce4d9;
+    margin-bottom: 42px;
+}
+
+.paniers-entete h1 {
+    margin: 12px 0 18px;
+}
+
+.paniers-entete > p:last-child {
+    color: #617064;
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+.paniers-section {
+    margin-bottom: 48px;
+}
+
+.paniers-section h2 {
+    margin-bottom: 22px;
+}
+
+.paniers-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.paniers-table th,
+.paniers-table td {
+    padding: 17px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e3e9e0;
+}
+
+.paniers-table th {
+    color: #566c5d;
+    font-size: 13px;
+    font-weight: 600;
+    background: #f0f4ee;
+}
+
+.paniers-composition {
+    background: white;
+    border: 1px solid #e3e9e0;
+    padding: 26px 30px;
+    margin-top: 18px;
+    border-radius: 6px;
+}
+
+.paniers-composition h3 {
+    color: #244b37;
+    font-size: 22px;
+    margin-top: 0;
+}
+
+.paniers-composition li {
+    margin-bottom: 9px;
+}
+
+.paniers-retour a {
+    color: #244b37;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .page-paniers {
+        padding: 28px 16px;
+    }
+
+    .paniers-table th,
+    .paniers-table td {
+        padding: 12px 8px;
+        font-size: 13px;
+    }
+
+    .paniers-composition {
+        padding: 20px;
+    }
+}
+
+
+/* En-tête commun à toutes les pages */
+
+.entete {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.entete-logo {
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.navigation a {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.navigation a:hover,
+.entete-logo:hover {
+    color: #d6e8cb;
+}
+
+@media (max-width: 600px) {
+    .entete {
+        padding: 20px;
+    }
+
+    .navigation {
+        gap: 16px;
+    }
+}
+
+
+/* Formulaire de composition des paniers */
+
+.paniers-formulaire {
+    background: #ffffff;
+    border: 1px solid #e3e9e0;
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.paniers-formulaire h3 {
+    margin: 0 0 20px;
+    color: #244b37;
+}
+
+.paniers-formulaire h3:not(:first-child) {
+    margin-top: 35px;
+}
+
+.paniers-champs {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(190px, 1fr)
+    );
+    gap: 20px;
+}
+
+.paniers-champ {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.paniers-champ label {
+    font-weight: 600;
+    color: #244b37;
+}
+
+.paniers-champ input {
+    padding: 12px 14px;
+    border: 1px solid #cbd7cb;
+    border-radius: 5px;
+    font: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.paniers-champ input:focus {
+    outline: 2px solid #799b77;
+    outline-offset: 2px;
+}
+
+.paniers-champ small {
+    color: #617064;
+}
+
+.paniers-bouton {
+    margin-top: 30px;
+    padding: 14px 24px;
+    background: #244b37;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.paniers-bouton:hover {
+    background: #356b4d;
+}
+
+.paniers-erreurs {
+    background: #fff4f2;
+    border: 1px solid #e9b5ac;
+    border-radius: 5px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    color: #973c30;
+}
+
+@media (max-width: 600px) {
+    .paniers-formulaire {
+        padding: 20px;
+    }
+
+    .paniers-bouton {
+        width: 100%;
+    }
+}
+
+/* Analyse de la diversité des paniers */
+
+.paniers-diversite-ok {
+    color: #276749;
+    background: #edf7ef;
+    padding: 12px 16px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.paniers-diversite-alerte {
+    color: #965c18;
+    background: #fff4df;
+    padding: 12px 16px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+
+
+
