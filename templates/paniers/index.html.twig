@@ -1,0 +1,218 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Composition des paniers{% endblock %}
+
+{% block body %}
+<main class="page-paniers">
+
+    <header class="paniers-entete">
+        <p class="sous-titre">SAÉ 5 — Réseau Cocagne</p>
+        <h1>Composition des paniers</h1>
+        <p>
+            Renseignez les stocks et les quantités de paniers
+            à préparer pour générer une proposition.
+        </p>
+    </header>
+
+    <section class="paniers-section">
+        <h2>Préparer une composition</h2>
+
+        {% if erreurs is not empty %}
+            <div class="paniers-erreurs" role="alert">
+                <strong>Vérifiez les données saisies :</strong>
+                <ul>
+                    {% for erreur in erreurs %}
+                        <li>{{ erreur }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="post"
+      action="{{ path('app_paniers') }}"
+      data-turbo="false"
+      class="paniers-formulaire">
+
+      <input
+            type="hidden"
+            name="_csrf_token"
+            value="{{ csrf_token('composition_paniers') }}"
+        >
+
+            <h3>Stocks disponibles</h3>
+
+            <div class="paniers-champs">
+                {% for legume, quantite in quantites %}
+                    <div class="paniers-champ">
+                        <label for="stock-{{ legume }}">
+                            {{ legume|replace({'_': ' '})|capitalize }}
+                        </label>
+
+                        <input
+                            id="stock-{{ legume }}"
+                            type="number"
+                            name="stocks[{{ legume }}]"
+                            value="{{ quantite }}"
+                            min="0"
+                            max="1000000"
+                            step="0.01"
+                            required
+                        >
+
+                        <small>
+                            {{ unites[legume] }} disponibles —
+                            {{ prix[legume]|number_format(2, ',', ' ') }}
+                            €/{{ unites[legume] }}
+                        </small>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <h3>Paniers à préparer</h3>
+
+            <div class="paniers-champs">
+                {% for nom, nombre in nombresPaniers %}
+                    <div class="paniers-champ">
+                        <label for="panier-{{ nom }}">
+                            Panier {{ nom }}
+                        </label>
+
+                        <input
+                            id="panier-{{ nom }}"
+                            type="number"
+                            name="paniers[{{ nom }}]"
+                            value="{{ nombre }}"
+                            min="0"
+                            max="100000"
+                            step="1"
+                            required
+                        >
+
+                        <small>
+                            Valeur cible :
+                            {{ valeursCibles[nom]|number_format(2, ',', ' ') }} €
+                        </small>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="paniers-methode">
+                <label for="methode-repartition">
+                    Méthode de répartition
+                </label>
+
+                <select
+                    id="methode-repartition"
+                    name="methode_repartition"
+                    required
+                >
+                    <option
+                        value="equitable"
+                        {% if methodeRepartition == 'equitable' %}selected{% endif %}
+                    >
+                        Répartition équitable
+                    </option>
+
+                    <option
+                        value="homogene"
+                        {% if methodeRepartition == 'homogene' %}selected{% endif %}
+                    >
+                        Répartition homogène
+                    </option>
+                </select>
+            </div>
+
+            <button type="submit" class="paniers-bouton">
+                Générer les compositions
+            </button>
+        </form>
+    </section>
+
+        {% if resultat is not null %}
+        <section class="paniers-section" id="resultats-paniers">
+            <h2>Résultats de la répartition</h2>
+
+            <p>
+                Coefficient de répartition :
+                <strong>
+                    {{ (resultat.coefficientRepartition * 100)
+                        |number_format(1, ',', ' ') }} %
+                </strong>
+            </p>
+
+            {% for nom, panier in resultat.paniers %}
+                <article class="paniers-composition">
+                    <h3>Panier {{ nom }}</h3>
+
+                    {% if analyseDiversite[nom] is defined %}
+                        {% set analyse = analyseDiversite[nom] %}
+
+                        {% if analyse.diversiteSuffisante %}
+                            <p class="paniers-diversite-ok">
+                                Diversité suffisante :
+                                {{ analyse.nombreLegumes }} légumes différents.
+                            </p>
+                        {% else %}
+                            <p class="paniers-diversite-alerte">
+                                Diversité insuffisante :
+                                {{ analyse.nombreLegumes }} légume(s) différent(s).
+                                Minimum souhaité : {{ analyse.minimumLegumes }}.
+                            </p>
+                        {% endif %}
+                    {% endif %}
+
+                    <p>Nombre à préparer : {{ panier.nombre }}</p>
+
+                    <ul>
+                        {% for legume, quantite in panier.composition %}
+                            <li>
+                                {{ legume|replace({'_': ' '})|capitalize }} :
+                                {{ quantite|number_format(3, ',', ' ') }}
+                                {{ unites[legume] }} par panier
+                            </li>
+                        {% else %}
+                            <li>Aucun légume attribué.</li>
+                        {% endfor %}
+                    </ul>
+
+                    <p>
+                        Valeur obtenue :
+                        <strong>
+                            {{ panier.valeur|number_format(2, ',', ' ') }} €
+                        </strong>
+                        /
+                        {{ panier.valeurCible|number_format(2, ',', ' ') }} €
+                    </p>
+                </article>
+            {% endfor %}
+        </section>
+
+        <section class="paniers-section">
+            <h2>Stocks restants</h2>
+
+            <table class="paniers-table">
+                <thead>
+                    <tr>
+                        <th>Légume</th>
+                        <th>Quantité restante</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for nom, stock in resultat.stocksRestants %}
+                        <tr>
+                            <td>
+                                {{ nom|replace({'_': ' '})|capitalize }}
+                            </td>
+                            <td>
+                                {{ stock.quantite|number_format(3, ',', ' ') }}
+                                {{ unites[nom] }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% endif %}
+
+</main>
+{% endblock %}
