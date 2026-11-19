@@ -19,3 +19,24 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 ###< symfony/mailer ###
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+      - symfony_cache:/app/var/cache
+    environment:
+      APP_ENV: dev
+      APP_SECRET: local_dev_secret_only
+      DATABASE_URL: "postgresql://app:password@database:5432/app?serverVersion=16&charset=utf8"
+      MAILER_DSN: "smtp://mailer:1025"
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  symfony_cache:
