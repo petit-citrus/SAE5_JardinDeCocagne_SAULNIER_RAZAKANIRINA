@@ -43,10 +43,45 @@ class Saison
     #[ORM\OneToMany(targetEntity: Adhesion::class, mappedBy: 'saison')]
     private Collection $adhesions;
 
+    /**
+     * @var Collection<int, DecalageJourFerie>
+     */
+    #[ORM\OneToMany(targetEntity: DecalageJourFerie::class, mappedBy: 'saison')]
+    private Collection $decalagesJoursFeries;
+
+    /**
+     * @var Collection<int, CalendrierDiffusion>
+     */
+    #[ORM\OneToMany(targetEntity: CalendrierDiffusion::class, mappedBy: 'saison')]
+    private Collection $calendriersDiffusion;
+
+    /**
+     * @var Collection<int, CompositionPanier>
+     */
+    #[ORM\OneToMany(targetEntity: CompositionPanier::class, mappedBy: 'saison')]
+    private Collection $compositionsPaniers;
+
+    /**
+     * @var Collection<int, AbonnementClient>
+     */
+    #[ORM\OneToMany(targetEntity: AbonnementClient::class, mappedBy: 'saison')]
+    private Collection $abonnementsClients;
+
+    /**
+     * @var Collection<int, FeuilleDeChou>
+     */
+    #[ORM\OneToMany(targetEntity: FeuilleDeChou::class, mappedBy: 'saison')]
+    private Collection $feuillesDeChou;
+
     public function __construct()
     {
         $this->semainesFermeture = new ArrayCollection();
         $this->adhesions = new ArrayCollection();
+        $this->decalagesJoursFeries = new ArrayCollection();
+        $this->calendriersDiffusion = new ArrayCollection();
+        $this->compositionsPaniers = new ArrayCollection();
+        $this->abonnementsClients = new ArrayCollection();
+        $this->feuillesDeChou = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -166,6 +201,151 @@ class Saison
         if ($this->adhesions->removeElement($adhesion)) {
             if ($adhesion->getSaison() === $this) {
                 $adhesion->setSaison(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DecalageJourFerie>
+     */
+    public function getDecalagesJoursFeries(): Collection
+    {
+        return $this->decalagesJoursFeries;
+    }
+
+    public function addDecalageJourFerie(DecalageJourFerie $decalage): static
+    {
+        if (!$this->decalagesJoursFeries->contains($decalage)) {
+            $this->decalagesJoursFeries->add($decalage);
+            $decalage->setSaison($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecalageJourFerie(DecalageJourFerie $decalage): static
+    {
+        if ($this->decalagesJoursFeries->removeElement($decalage)) {
+            if ($decalage->getSaison() === $this) {
+                $decalage->setSaison(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CalendrierDiffusion>
+     */
+    public function getCalendriersDiffusion(): Collection
+    {
+        return $this->calendriersDiffusion;
+    }
+
+    public function addCalendrierDiffusion(CalendrierDiffusion $calendrier): static
+    {
+        if (!$this->calendriersDiffusion->contains($calendrier)) {
+            $this->calendriersDiffusion->add($calendrier);
+            $calendrier->setSaison($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCalendrierDiffusion(CalendrierDiffusion $calendrier): static
+    {
+        if ($this->calendriersDiffusion->removeElement($calendrier)) {
+            if ($calendrier->getSaison() === $this) {
+                $calendrier->setSaison(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CompositionPanier>
+     */
+    public function getCompositionsPaniers(): Collection
+    {
+        return $this->compositionsPaniers;
+    }
+
+    public function addCompositionPanier(CompositionPanier $compositionPanier): static
+    {
+        if (!$this->compositionsPaniers->contains($compositionPanier)) {
+            $this->compositionsPaniers->add($compositionPanier);
+            $compositionPanier->setSaison($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompositionPanier(CompositionPanier $compositionPanier): static
+    {
+        if ($this->compositionsPaniers->removeElement($compositionPanier)) {
+            if ($compositionPanier->getSaison() === $this) {
+                $compositionPanier->setSaison(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AbonnementClient>
+     */
+    public function getAbonnementsClients(): Collection
+    {
+        return $this->abonnementsClients;
+    }
+
+    public function addAbonnementClient(AbonnementClient $abonnement): static
+    {
+        if (!$this->abonnementsClients->contains($abonnement)) {
+            $this->abonnementsClients->add($abonnement);
+            $abonnement->setSaison($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAbonnementClient(AbonnementClient $abonnement): static
+    {
+        if ($this->abonnementsClients->removeElement($abonnement)) {
+            if ($abonnement->getSaison() === $this) {
+                $abonnement->setSaison(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FeuilleDeChou>
+     */
+    public function getFeuillesDeChou(): Collection
+    {
+        return $this->feuillesDeChou;
+    }
+
+    public function addFeuilleDeChou(FeuilleDeChou $feuille): static
+    {
+        if (!$this->feuillesDeChou->contains($feuille)) {
+            $this->feuillesDeChou->add($feuille);
+            $feuille->setSaison($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFeuilleDeChou(FeuilleDeChou $feuille): static
+    {
+        if ($this->feuillesDeChou->removeElement($feuille)) {
+            if ($feuille->getSaison() === $this) {
+                $feuille->setSaison(null);
             }
         }
 

@@ -53,9 +53,44 @@ class Utilisateur
     #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'utilisateurs')]
     private Collection $roles;
 
+    /**
+     * @var Collection<int, Adhesion>
+     */
+    #[ORM\OneToMany(targetEntity: Adhesion::class, mappedBy: 'utilisateur')]
+    private Collection $adhesions;
+
+    /**
+     * @var Collection<int, AbonnementClient>
+     */
+    #[ORM\OneToMany(targetEntity: AbonnementClient::class, mappedBy: 'utilisateur')]
+    private Collection $abonnementsClients;
+
+    /**
+     * @var Collection<int, Commande>
+     */
+    #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'utilisateur')]
+    private Collection $commandes;
+
+    /**
+     * @var Collection<int, Facture>
+     */
+    #[ORM\OneToMany(targetEntity: Facture::class, mappedBy: 'utilisateur')]
+    private Collection $factures;
+
+    /**
+     * @var Collection<int, Reglement>
+     */
+    #[ORM\OneToMany(targetEntity: Reglement::class, mappedBy: 'utilisateur')]
+    private Collection $reglements;
+
     public function __construct()
     {
         $this->roles = new ArrayCollection();
+        $this->adhesions = new ArrayCollection();
+        $this->abonnementsClients = new ArrayCollection();
+        $this->commandes = new ArrayCollection();
+        $this->factures = new ArrayCollection();
+        $this->reglements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -203,6 +238,151 @@ class Utilisateur
     public function removeRole(Role $role): static
     {
         $this->roles->removeElement($role);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Adhesion>
+     */
+    public function getAdhesions(): Collection
+    {
+        return $this->adhesions;
+    }
+
+    public function addAdhesion(Adhesion $adhesion): static
+    {
+        if (!$this->adhesions->contains($adhesion)) {
+            $this->adhesions->add($adhesion);
+            $adhesion->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAdhesion(Adhesion $adhesion): static
+    {
+        if ($this->adhesions->removeElement($adhesion)) {
+            if ($adhesion->getUtilisateur() === $this) {
+                $adhesion->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AbonnementClient>
+     */
+    public function getAbonnementsClients(): Collection
+    {
+        return $this->abonnementsClients;
+    }
+
+    public function addAbonnementClient(AbonnementClient $abonnement): static
+    {
+        if (!$this->abonnementsClients->contains($abonnement)) {
+            $this->abonnementsClients->add($abonnement);
+            $abonnement->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAbonnementClient(AbonnementClient $abonnement): static
+    {
+        if ($this->abonnementsClients->removeElement($abonnement)) {
+            if ($abonnement->getUtilisateur() === $this) {
+                $abonnement->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commande>
+     */
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): static
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes->add($commande);
+            $commande->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): static
+    {
+        if ($this->commandes->removeElement($commande)) {
+            if ($commande->getUtilisateur() === $this) {
+                $commande->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Facture>
+     */
+    public function getFactures(): Collection
+    {
+        return $this->factures;
+    }
+
+    public function addFacture(Facture $facture): static
+    {
+        if (!$this->factures->contains($facture)) {
+            $this->factures->add($facture);
+            $facture->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFacture(Facture $facture): static
+    {
+        if ($this->factures->removeElement($facture)) {
+            if ($facture->getUtilisateur() === $this) {
+                $facture->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reglement>
+     */
+    public function getReglements(): Collection
+    {
+        return $this->reglements;
+    }
+
+    public function addReglement(Reglement $reglement): static
+    {
+        if (!$this->reglements->contains($reglement)) {
+            $this->reglements->add($reglement);
+            $reglement->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReglement(Reglement $reglement): static
+    {
+        if ($this->reglements->removeElement($reglement)) {
+            if ($reglement->getUtilisateur() === $this) {
+                $reglement->setUtilisateur(null);
+            }
+        }
 
         return $this;
     }

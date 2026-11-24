@@ -42,9 +42,16 @@ class CompositionPanier
     #[ORM\OneToMany(targetEntity: LigneCompositionPanier::class, mappedBy: 'compositionPanier')]
     private Collection $lignesCompositionPanier;
 
+    /**
+     * @var Collection<int, LivraisonUnitaire>
+     */
+    #[ORM\OneToMany(targetEntity: LivraisonUnitaire::class, mappedBy: 'compositionPanier')]
+    private Collection $livraisonsUnitaires;
+
     public function __construct()
     {
         $this->lignesCompositionPanier = new ArrayCollection();
+        $this->livraisonsUnitaires = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -147,6 +154,35 @@ class CompositionPanier
         if ($this->lignesCompositionPanier->removeElement($ligne)) {
             if ($ligne->getCompositionPanier() === $this) {
                 $ligne->setCompositionPanier(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, LivraisonUnitaire>
+     */
+    public function getLivraisonsUnitaires(): Collection
+    {
+        return $this->livraisonsUnitaires;
+    }
+
+    public function addLivraisonUnitaire(LivraisonUnitaire $livraison): static
+    {
+        if (!$this->livraisonsUnitaires->contains($livraison)) {
+            $this->livraisonsUnitaires->add($livraison);
+            $livraison->setCompositionPanier($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLivraisonUnitaire(LivraisonUnitaire $livraison): static
+    {
+        if ($this->livraisonsUnitaires->removeElement($livraison)) {
+            if ($livraison->getCompositionPanier() === $this) {
+                $livraison->setCompositionPanier(null);
             }
         }
 

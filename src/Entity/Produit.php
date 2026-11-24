@@ -64,12 +64,40 @@ class Produit
     #[ORM\OneToMany(targetEntity: LigneCompositionPanier::class, mappedBy: 'produit')]
     private Collection $lignesCompositionPanier;
 
+    /**
+     * @var Collection<int, FormuleAbonnement>
+     */
+    #[ORM\OneToMany(targetEntity: FormuleAbonnement::class, mappedBy: 'produit')]
+    private Collection $formulesAbonnement;
+
+    /**
+     * @var Collection<int, LigneLivraison>
+     */
+    #[ORM\OneToMany(targetEntity: LigneLivraison::class, mappedBy: 'produit')]
+    private Collection $lignesLivraison;
+
+    /**
+     * @var Collection<int, FeuilleDeChou>
+     */
+    #[ORM\OneToMany(targetEntity: FeuilleDeChou::class, mappedBy: 'produit')]
+    private Collection $feuillesDeChou;
+
+    /**
+     * @var Collection<int, Recette>
+     */
+    #[ORM\ManyToMany(targetEntity: Recette::class, mappedBy: 'produits')]
+    private Collection $recettes;
+
     public function __construct()
     {
         $this->tarifsCategorieClient = new ArrayCollection();
         $this->stocksLegumes = new ArrayCollection();
         $this->compositionsPaniers = new ArrayCollection();
         $this->lignesCompositionPanier = new ArrayCollection();
+        $this->formulesAbonnement = new ArrayCollection();
+        $this->lignesLivraison = new ArrayCollection();
+        $this->feuillesDeChou = new ArrayCollection();
+        $this->recettes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -284,6 +312,120 @@ class Produit
             if ($ligne->getProduit() === $this) {
                 $ligne->setProduit(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FormuleAbonnement>
+     */
+    public function getFormulesAbonnement(): Collection
+    {
+        return $this->formulesAbonnement;
+    }
+
+    public function addFormuleAbonnement(FormuleAbonnement $formule): static
+    {
+        if (!$this->formulesAbonnement->contains($formule)) {
+            $this->formulesAbonnement->add($formule);
+            $formule->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormuleAbonnement(FormuleAbonnement $formule): static
+    {
+        if ($this->formulesAbonnement->removeElement($formule)) {
+            if ($formule->getProduit() === $this) {
+                $formule->setProduit(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, LigneLivraison>
+     */
+    public function getLignesLivraison(): Collection
+    {
+        return $this->lignesLivraison;
+    }
+
+    public function addLigneLivraison(LigneLivraison $ligne): static
+    {
+        if (!$this->lignesLivraison->contains($ligne)) {
+            $this->lignesLivraison->add($ligne);
+            $ligne->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLigneLivraison(LigneLivraison $ligne): static
+    {
+        if ($this->lignesLivraison->removeElement($ligne)) {
+            if ($ligne->getProduit() === $this) {
+                $ligne->setProduit(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FeuilleDeChou>
+     */
+    public function getFeuillesDeChou(): Collection
+    {
+        return $this->feuillesDeChou;
+    }
+
+    public function addFeuilleDeChou(FeuilleDeChou $feuille): static
+    {
+        if (!$this->feuillesDeChou->contains($feuille)) {
+            $this->feuillesDeChou->add($feuille);
+            $feuille->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFeuilleDeChou(FeuilleDeChou $feuille): static
+    {
+        if ($this->feuillesDeChou->removeElement($feuille)) {
+            if ($feuille->getProduit() === $this) {
+                $feuille->setProduit(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Recette>
+     */
+    public function getRecettes(): Collection
+    {
+        return $this->recettes;
+    }
+
+    public function addRecette(Recette $recette): static
+    {
+        if (!$this->recettes->contains($recette)) {
+            $this->recettes->add($recette);
+            $recette->addProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecette(Recette $recette): static
+    {
+        if ($this->recettes->removeElement($recette)) {
+            $recette->removeProduit($this);
         }
 
         return $this;

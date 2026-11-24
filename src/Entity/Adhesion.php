@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AdhesionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AdhesionRepository::class)]
@@ -36,6 +38,17 @@ class Adhesion
     #[ORM\ManyToOne(inversedBy: 'adhesions')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Saison $saison = null;
+
+    /**
+     * @var Collection<int, Facture>
+     */
+    #[ORM\OneToMany(targetEntity: Facture::class, mappedBy: 'adhesion')]
+    private Collection $factures;
+
+    public function __construct()
+    {
+        $this->factures = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -122,6 +135,35 @@ class Adhesion
     public function setSaison(?Saison $saison): static
     {
         $this->saison = $saison;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Facture>
+     */
+    public function getFactures(): Collection
+    {
+        return $this->factures;
+    }
+
+    public function addFacture(Facture $facture): static
+    {
+        if (!$this->factures->contains($facture)) {
+            $this->factures->add($facture);
+            $facture->setAdhesion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFacture(Facture $facture): static
+    {
+        if ($this->factures->removeElement($facture)) {
+            if ($facture->getAdhesion() === $this) {
+                $facture->setAdhesion(null);
+            }
+        }
 
         return $this;
     }

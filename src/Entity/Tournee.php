@@ -47,11 +47,25 @@ class Tournee
     #[ORM\OneToMany(targetEntity: CalendrierDiffusion::class, mappedBy: 'tournee')]
     private Collection $calendriersDiffusion;
 
+    /**
+     * @var Collection<int, CompositionPanier>
+     */
+    #[ORM\OneToMany(targetEntity: CompositionPanier::class, mappedBy: 'tournee')]
+    private Collection $compositionsPaniers;
+
+    /**
+     * @var Collection<int, FeuilleDeChou>
+     */
+    #[ORM\OneToMany(targetEntity: FeuilleDeChou::class, mappedBy: 'tournee')]
+    private Collection $feuillesDeChou;
+
     public function __construct()
     {
         $this->tourneePointsDepot = new ArrayCollection();
         $this->decalagesJoursFeries = new ArrayCollection();
         $this->calendriersDiffusion = new ArrayCollection();
+        $this->compositionsPaniers = new ArrayCollection();
+        $this->feuillesDeChou = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -188,6 +202,64 @@ class Tournee
         if ($this->calendriersDiffusion->removeElement($calendrier)) {
             if ($calendrier->getTournee() === $this) {
                 $calendrier->setTournee(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CompositionPanier>
+     */
+    public function getCompositionsPaniers(): Collection
+    {
+        return $this->compositionsPaniers;
+    }
+
+    public function addCompositionPanier(CompositionPanier $compositionPanier): static
+    {
+        if (!$this->compositionsPaniers->contains($compositionPanier)) {
+            $this->compositionsPaniers->add($compositionPanier);
+            $compositionPanier->setTournee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompositionPanier(CompositionPanier $compositionPanier): static
+    {
+        if ($this->compositionsPaniers->removeElement($compositionPanier)) {
+            if ($compositionPanier->getTournee() === $this) {
+                $compositionPanier->setTournee(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FeuilleDeChou>
+     */
+    public function getFeuillesDeChou(): Collection
+    {
+        return $this->feuillesDeChou;
+    }
+
+    public function addFeuilleDeChou(FeuilleDeChou $feuille): static
+    {
+        if (!$this->feuillesDeChou->contains($feuille)) {
+            $this->feuillesDeChou->add($feuille);
+            $feuille->setTournee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFeuilleDeChou(FeuilleDeChou $feuille): static
+    {
+        if ($this->feuillesDeChou->removeElement($feuille)) {
+            if ($feuille->getTournee() === $this) {
+                $feuille->setTournee(null);
             }
         }
 

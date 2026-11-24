@@ -31,9 +31,16 @@ class Frequence
     #[ORM\OneToMany(targetEntity: CalendrierDiffusion::class, mappedBy: 'frequence')]
     private Collection $calendriersDiffusion;
 
+    /**
+     * @var Collection<int, FormuleAbonnement>
+     */
+    #[ORM\OneToMany(targetEntity: FormuleAbonnement::class, mappedBy: 'frequence')]
+    private Collection $formulesAbonnement;
+
     public function __construct()
     {
         $this->calendriersDiffusion = new ArrayCollection();
+        $this->formulesAbonnement = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -100,6 +107,35 @@ class Frequence
         if ($this->calendriersDiffusion->removeElement($calendrier)) {
             if ($calendrier->getFrequence() === $this) {
                 $calendrier->setFrequence(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FormuleAbonnement>
+     */
+    public function getFormulesAbonnement(): Collection
+    {
+        return $this->formulesAbonnement;
+    }
+
+    public function addFormuleAbonnement(FormuleAbonnement $formule): static
+    {
+        if (!$this->formulesAbonnement->contains($formule)) {
+            $this->formulesAbonnement->add($formule);
+            $formule->setFrequence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormuleAbonnement(FormuleAbonnement $formule): static
+    {
+        if ($this->formulesAbonnement->removeElement($formule)) {
+            if ($formule->getFrequence() === $this) {
+                $formule->setFrequence(null);
             }
         }
 

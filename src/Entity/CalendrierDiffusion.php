@@ -42,9 +42,16 @@ class CalendrierDiffusion
     #[ORM\OneToMany(targetEntity: ExceptionCalendrier::class, mappedBy: 'calendrierDiffusion')]
     private Collection $exceptionsCalendrier;
 
+    /**
+     * @var Collection<int, AbonnementClient>
+     */
+    #[ORM\OneToMany(targetEntity: AbonnementClient::class, mappedBy: 'calendrierDiffusion')]
+    private Collection $abonnementsClients;
+
     public function __construct()
     {
         $this->exceptionsCalendrier = new ArrayCollection();
+        $this->abonnementsClients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -147,6 +154,35 @@ class CalendrierDiffusion
         if ($this->exceptionsCalendrier->removeElement($exceptionCalendrier)) {
             if ($exceptionCalendrier->getCalendrierDiffusion() === $this) {
                 $exceptionCalendrier->setCalendrierDiffusion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AbonnementClient>
+     */
+    public function getAbonnementsClients(): Collection
+    {
+        return $this->abonnementsClients;
+    }
+
+    public function addAbonnementClient(AbonnementClient $abonnement): static
+    {
+        if (!$this->abonnementsClients->contains($abonnement)) {
+            $this->abonnementsClients->add($abonnement);
+            $abonnement->setCalendrierDiffusion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAbonnementClient(AbonnementClient $abonnement): static
+    {
+        if ($this->abonnementsClients->removeElement($abonnement)) {
+            if ($abonnement->getCalendrierDiffusion() === $this) {
+                $abonnement->setCalendrierDiffusion(null);
             }
         }
 
