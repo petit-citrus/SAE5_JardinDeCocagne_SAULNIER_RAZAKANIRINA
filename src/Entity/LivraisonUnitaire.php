@@ -15,10 +15,10 @@ class LivraisonUnitaire
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: 'date_immutable')]
     private ?\DateTimeImmutable $datePrevue = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[ORM\Column(type: 'date_immutable', nullable: true)]
     private ?\DateTimeImmutable $dateEffective = null;
 
     #[ORM\Column(length: 255)]

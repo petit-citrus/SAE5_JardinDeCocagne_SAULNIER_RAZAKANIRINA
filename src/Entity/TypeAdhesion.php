@@ -24,7 +24,7 @@ class TypeAdhesion
     #[ORM\Column(length: 255)]
     private ?string $periodicite = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[ORM\Column(type: 'date_immutable', nullable: true)]
     private ?\DateTimeImmutable $dateCharniere = null;
 
     #[ORM\ManyToOne(inversedBy: 'typesAdhesion')]

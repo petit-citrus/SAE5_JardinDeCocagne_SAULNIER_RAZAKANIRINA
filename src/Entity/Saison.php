@@ -18,10 +18,10 @@ class Saison
     #[ORM\Column(length: 255)]
     private ?string $libelle = null;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: 'date_immutable')]
     private ?\DateTimeImmutable $dateDebut = null;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: 'date_immutable')]
     private ?\DateTimeImmutable $dateFin = null;
 
     #[ORM\Column]

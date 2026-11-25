@@ -13,10 +13,10 @@ class ExceptionCalendrier
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: 'date_immutable')]
     private ?\DateTimeImmutable $dateOriginale = null;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: 'date_immutable')]
     private ?\DateTimeImmutable $dateModifiee = null;
 
     #[ORM\ManyToOne(inversedBy: 'exceptionsCalendrier')]

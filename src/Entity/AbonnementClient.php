@@ -15,10 +15,10 @@ class AbonnementClient
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: 'date_immutable')]
     private ?\DateTimeImmutable $dateDebut = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[ORM\Column(type: 'date_immutable', nullable: true)]
     private ?\DateTimeImmutable $dateFin = null;
 
     #[ORM\Column(length: 255)]

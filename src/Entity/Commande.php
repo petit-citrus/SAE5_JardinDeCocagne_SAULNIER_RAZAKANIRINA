@@ -15,7 +15,7 @@ class Commande
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $dateCommande = null;
 
     #[ORM\Column(type: 'float')]
